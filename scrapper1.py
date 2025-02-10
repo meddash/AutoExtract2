@@ -3,7 +3,9 @@ from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
 from crawl4ai.content_filter_strategy import PruningContentFilter
 from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
 
-async def main():
+async def main(in_url,
+               mode # 1 - весь markdown, 2 - с цитатами, 3 - с ссылками , 4 - обрезанный если есть, иначе весь
+               ):
     # Настройка фильтра обрезки контента
     prune_filter = PruningContentFilter(
         threshold=0.45,           # Порог обрезки; ниже — больше контента сохраняется
@@ -21,7 +23,7 @@ async def main():
 
     async with AsyncWebCrawler() as crawler:
         result = await crawler.arun(
-            url="https://brandshop.ru/muzhskoe/", 
+            url=in_url, 
             config=config
         )
 
@@ -29,15 +31,22 @@ async def main():
             # Доступ к различным вариантам Markdown
             if result.markdown_v2:
                 md_res = result.markdown_v2
-                print("Оригинальный Markdown:", md_res.raw_markdown[:300])
-                print("Markdown с цитатами:", md_res.markdown_with_citations[:300])
-                print("Ссылки:", md_res.references_markdown)
-                if md_res.fit_markdown:
-                    print("Обрезанный текст:", md_res.fit_markdown[:300])
+                if mode == 1:
+                    return("Оригинальный Markdown:" + md_res.raw_markdown)
+                elif mode == 2:
+                    return("Markdown с цитатами:" + md_res.markdown_with_citations)
+                elif mode == 3:
+                    return("Ссылки:" + md_res.references_markdown)
+                elif mode == 4:
+                    if md_res.fit_markdown:
+                        return("Обрезанный текст:" + md_res.fit_markdown)
+                    else:
+                        return("Оригинальный Markdown:" + md_res.raw_markdown)
             else:
                 print("Markdown:", result.markdown[:200] if result.markdown else "N/A")
         else:
             print("Ошибка:", result.error_message)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    website_markdown = asyncio.run(main("https://brandshop.ru/muzhskoe/", 4))
+    print(website_markdown)
