@@ -1,21 +1,32 @@
-import webscraper as ws
+# import asyncio
+
+# # Создаём экземпляр класса WebScraper
+# scraper = WebScraper()
+
+# async def main():
+#     # Указываем URL сайта, который нужно спарсить
+#     url = "https://example.com"
+    
+#     # Вызываем метод для получения Markdown
+#     markdown = await scraper.fetch_markdown(url)
+    
+#     # Печатаем полученный Markdown
+#     print(markdown)
+
+# # Запускаем асинхронную функцию
+# asyncio.run(main())
+
 import os
 import json
-
+from webscraper import WebScraper
 
 if __name__ == "__main__":
-    # scraper = ws.WebScraper()
-    # web_url = "https://brandshop.ru/muzhskoe/"
-    # web_url = "https://3dmechanika.com/"
-    # try:
-    #     markdown_content = scraper.get_markdown(web_url, mode=4)
-    #     print(markdown_content)
-    #     # Здесь вы можете передать markdown_content в вашу LLM для дальнейшей обработки
-    # except Exception as e:
-    #     print(f"Произошла ошибка: {e}")
-
-    parser = ws.UniversalWebParser(llm_api_key=os.getenv("OPENAI_API_KEY"))
-    url = "https://brandshop.ru/muzhskoe/"
-    prompt = "Достань мне все товары, их цены и фотографии с данного сайта"
-    result = parser.run(url, prompt)
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    scraper = WebScraper()
+    url = "https://brandshop.ru/muzhskoe/" # Замени на реальный URL
+    prompt = "Определи список товаров из текста и представь их в удобном для чтения формате (таблица, JSON или список)"
+    
+    try:
+        result = scraper.run(url, prompt)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    except Exception as e:
+        print(f"Ошибка: {e}")
